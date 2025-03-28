@@ -15,7 +15,7 @@ To change these settings, simply edit the `.env` file in the root directory of t
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/hello-genai.git
+   git clone https://github.com/docker/hello-genai
    cd hello-genai
    ```
 
