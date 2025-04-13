@@ -87,102 +87,91 @@ func handleChatInterface(w http.ResponseWriter, r *http.Request) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hello-GenAI in Go</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/languages/go.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css">
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+        .prose pre {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
         }
-        h1 {
-            color: #0078D7;
-            text-align: center;
+        .prose code {
+            background-color: #f3f4f6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
         }
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 80vh;
+        .prose pre code {
+            background-color: transparent;
+            padding: 0;
         }
-        #chat-box {
-            flex-grow: 1;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            overflow-y: auto;
-            background-color: #f9f9f9;
-        }
-        .input-container {
-            display: flex;
-            gap: 10px;
-        }
-        #message-input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #0078D7;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #0056a3;
-        }
-        .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .user-message {
-            background-color: #e3f2fd;
-            border-left: 4px solid #2196F3;
-            text-align: right;
-        }
-        .bot-message {
-            background-color: #f1f1f1;
-            border-left: 4px solid #9e9e9e;
+        .message-content {
+            max-width: 100%;
+            overflow-x: auto;
         }
         .loading {
-            text-align: center;
-            margin: 10px 0;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            color: #6366f1;
             font-style: italic;
-            color: #666;
-        }
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #666;
         }
     </style>
 </head>
-<body>
-    <h1>Hello-GenAI in Go</h1>
-    <div class="container">
-        <div id="chat-box">
-            <div class="message bot-message">
-                Hello! I'm your GenAI assistant. How can I help you today?
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-indigo-600 mb-8">Hello-GenAI in Go</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div id="chat-box" class="h-[70vh] overflow-y-auto p-6 space-y-4">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex-1 bg-indigo-50 rounded-lg p-4 prose max-w-none">
+                        <div class="message-content">
+                            Hello! I'm your GenAI assistant. How can I help you today?
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 p-4">
+                <div class="flex space-x-4">
+                    <input type="text" id="message-input" 
+                           class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                           placeholder="Type your message here..." autofocus>
+                    <button id="send-button" 
+                            class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+                        Send
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="input-container">
-            <input type="text" id="message-input" placeholder="Type your message here..." autofocus>
-            <button id="send-button">Send</button>
+
+        <div class="mt-4 text-center text-sm text-gray-500">
+            &copy; 2025 hello-genai | Powered by <span id="model-name" class="font-medium">Loading model info...</span>
         </div>
-    </div>
-    <div class="footer">
-        &copy; 2025 hello-genai | Powered by <span id="model-name">Loading model info...</span>
     </div>
 
     <script>
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                return code;
+            },
+            breaks: true
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             const chatBox = document.getElementById('chat-box');
             const messageInput = document.getElementById('message-input');
@@ -208,7 +197,6 @@ func handleChatInterface(w http.ResponseWriter, r *http.Request) {
             .catch(error => {
                 modelNameSpan.textContent = "AI Language Model";
             });
-
 
             function sendMessage() {
                 const message = messageInput.value.trim();
@@ -253,8 +241,27 @@ func handleChatInterface(w http.ResponseWriter, r *http.Request) {
 
             function addMessageToChat(role, content) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = role === 'user' ? 'message user-message' : 'message bot-message';
-                messageDiv.textContent = content;
+                messageDiv.className = 'flex items-start space-x-3';
+                
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'flex-shrink-0';
+                iconDiv.innerHTML = role === 'user' 
+                    ? '<div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>'
+                    : '<div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center"><svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg></div>';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = role === 'user' 
+                    ? 'flex-1 bg-gray-50 rounded-lg p-4 prose max-w-none'
+                    : 'flex-1 bg-indigo-50 rounded-lg p-4 prose max-w-none';
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.innerHTML = marked.parse(content);
+                
+                contentDiv.appendChild(messageContent);
+                messageDiv.appendChild(iconDiv);
+                messageDiv.appendChild(contentDiv);
+                
                 chatBox.appendChild(messageDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
